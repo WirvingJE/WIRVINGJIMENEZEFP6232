@@ -11,6 +11,7 @@ namespace WIRVINGJIMENEZEFP6232.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[ApiKey]
     public class UsersController : ControllerBase
     {
         private readonly AnswersDBContext _context;
@@ -19,15 +20,30 @@ namespace WIRVINGJIMENEZEFP6232.Controllers
         {
             _context = context;
         }
+        //Este get valida el usuario que quiere ingresar en la app. 
+        //GET: api/Users
+        [HttpGet("ValidateLogin")]
+        public async Task<ActionResult<User>> ValidateLogin(string username, string password)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(e => e.UserName.Equals(username) &&
+                                                                 e.UserPassword == password);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
             return await _context.Users.ToListAsync();
         }
 
@@ -35,10 +51,10 @@ namespace WIRVINGJIMENEZEFP6232.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)
@@ -85,10 +101,10 @@ namespace WIRVINGJIMENEZEFP6232.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'AnswersDBContext.Users'  is null.");
-          }
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'AnswersDBContext.Users'  is null.");
+            }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
